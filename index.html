@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Live Player</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #controls {
+      flex: 0 0 auto;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #111;
+    }
+
+    #liveNumber {
+      width: 100px;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background: #222;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    #playButton {
+      height: 38px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 5px;
+      background: #1976d2;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    #playButton:hover {
+      background: #1565c0;
+    }
+
+    #player {
+      flex: 1;
+      width: 100%;
+      border: 0;
+      background: #000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="controls">
+    <input
+      id="liveNumber"
+      type="text"
+      inputmode="numeric"
+      maxlength="3"
+      placeholder="137"
+      value="137"
+    >
+
+    <button id="playButton">
+      재생
+    </button>
+  </div>
+
+  <iframe
+    id="player"
+    allow="autoplay; fullscreen"
+    allowfullscreen>
+  </iframe>
+
+  <script>
+    const input = document.getElementById("liveNumber");
+    const button = document.getElementById("playButton");
+    const player = document.getElementById("player");
+
+    const TOKEN =
+      "eyJleHAiOjE3ODgzOTk0MzksIm9yaWdpbiI6Imh0dHBzOi8vYm10djI0LmNvbSJ9." +
+      "8a1a6af9f4c532f341cc17d3d930525f66dd7b738dfb7499d14a8d3aaf5c7c0a";
+
+    function play() {
+      const number = input.value.trim();
+
+      // 정확히 숫자 3자리만 허용
+      if (!/^[0-9]{3}$/.test(number)) {
+        alert("숫자 3자리를 입력하세요. 예: 137");
+        return;
+      }
+
+      const originalUrl =
+        "https://btmtv.goststream.com/" +
+        "btmtv/theme/btmtv/view.php" +
+        "?ch=live" + number +
+        "&mode=single" +
+        "&slot=1" +
+        "&embed_token=" + TOKEN;
+
+      // Worker의 ?= 뒤에 들어갈 원본 URL을 encode
+      const workerUrl =
+        "https://golive.us-kbs11.workers.dev/url?=" +
+        encodeURIComponent(originalUrl);
+
+      player.src = workerUrl;
+    }
+
+    button.addEventListener("click", play);
+
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        play();
+      }
+    });
+
+    // 처음 열었을 때 live137 자동 재생
+    play();
+  </script>
+
+</body>
+</html>
