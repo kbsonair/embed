@@ -1,145 +1,154 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Live Player</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    #controls {
-      flex: 0 0 auto;
-      height: 55px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: #111;
-    }
-
-    #liveNumber {
-      width: 100px;
-      height: 38px;
-      padding: 0 10px;
-      border: 1px solid #444;
-      border-radius: 5px;
-      background: #222;
-      color: #fff;
-      font-size: 16px;
-    }
-
-    #playButton {
-      height: 38px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: 5px;
-      background: #1976d2;
-      color: #fff;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    #playButton:hover {
-      background: #1565c0;
-    }
-
-    #player {
-      flex: 1;
-      width: 100%;
-      border: 0;
-      background: #000;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>임베드 뷰어</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --accent: #4f8cff;
+    --text: #e8eaed;
+    --muted: #9aa0a6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 16px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid #2a2e37;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid #2a2e37;
+  }
+  .tab-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #2a2e37;
+    background: #22252d;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover { background: #2a2e37; }
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .frame-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .frame-inner {
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .empty-msg {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+  }
+  footer {
+    padding: 10px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
 </head>
-
 <body>
 
-  <div id="controls">
-    <input
-      id="liveNumber"
-      type="text"
-      inputmode="numeric"
-      maxlength="3"
-      placeholder="137"
-      value="137"
-    >
+<header>
+  <h1>임베드 뷰어</h1>
+</header>
 
-    <button id="playButton">
-      재생
-    </button>
+<div class="tabs" id="tabs"></div>
+
+<div class="frame-wrap">
+  <div class="frame-inner" id="frameInner">
+    <div class="empty-msg" id="emptyMsg">목록에서 항목을 선택하세요</div>
   </div>
+</div>
 
-  <iframe
-    id="player"
-    allow="autoplay; fullscreen"
-    allowfullscreen>
-  </iframe>
+<footer>탭을 클릭하면 해당 주소가 임베드됩니다.</footer>
 
-  <script>
-    const input = document.getElementById("liveNumber");
-    const button = document.getElementById("playButton");
-    const player = document.getElementById("player");
+<script>
+  // 여기에 원하는 embed 주소를 자유롭게 추가/삭제하세요.
+  const embedUrls = [
+    "https://playrecord.biz/embed/b42fsot9s74j",
+    "https://playrecord.biz/embed/al0bn0d459p3",
+    "https://playrecord.biz/embed/hyi7ypk5gpju",
+    "https://playrecord.biz/embed/1ewsu1kt32am",
+    "https://playrecord.biz/embed/e2c0u5d8amnn",
+    "https://playrecord.biz/embed/ez3290nynqsd",
+    "https://playrecord.biz/embed/hml5q6tnic7g",
+    "https://playrecord.biz/embed/dqd1f3i2mgyc",
+    "https://playrecord.biz/embed/yvxt50nkccyi",
+    "https://playrecord.biz/embed/bq8di4cbbvvq",
+    "https://playrecord.biz/embed/a7e375mkxsw9",
+    
+  ];
 
-    const TOKEN =
-      "eyJleHAiOjE3ODgzOTk0MzksIm9yaWdpbiI6Imh0dHBzOi8vYm10djI0LmNvbSJ9." +
-      "8a1a6af9f4c532f341cc17d3d930525f66dd7b738dfb7499d14a8d3aaf5c7c0a";
+  const tabsEl = document.getElementById('tabs');
+  const frameInner = document.getElementById('frameInner');
 
-    function play() {
-      const number = input.value.trim();
+  function showEmbed(index) {
+    const url = embedUrls[index];
+    frameInner.innerHTML = '<iframe src="' + url + '" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>';
 
-      // 정확히 숫자 3자리만 허용
-      if (!/^[0-9]{3}$/.test(number)) {
-        alert("숫자 3자리를 입력하세요. 예: 137");
-        return;
-      }
-
-      const originalUrl =
-        "https://btmtv.goststream.com/" +
-        "btmtv/theme/btmtv/view.php" +
-        "?ch=live" + number +
-        "&mode=single" +
-        "&slot=1" +
-        "&embed_token=" + TOKEN;
-
-      // Worker의 ?= 뒤에 들어갈 원본 URL을 encode
-      const workerUrl =
-        "https://golive.us-kbs11.workers.dev/url?=" +
-        encodeURIComponent(originalUrl);
-
-      player.src = workerUrl;
-    }
-
-    button.addEventListener("click", play);
-
-    input.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        play();
-      }
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', i === index);
     });
+  }
 
-    // 처음 열었을 때 live137 자동 재생
-    play();
-  </script>
+  embedUrls.forEach((url, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.textContent = '영상 ' + (i + 1);
+    btn.title = url;
+    btn.addEventListener('click', () => showEmbed(i));
+    tabsEl.appendChild(btn);
+  });
+
+  if (embedUrls.length > 0) {
+    showEmbed(0);
+  }
+</script>
 
 </body>
 </html>
